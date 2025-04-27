@@ -13,6 +13,8 @@ app.config.from_object('api.config.Config')
 db.init_app(app)
 user_rest_api.init_app(app)
 
+CORS(app)
+
 # Setup database
 @app.before_first_request
 def initialize_database():

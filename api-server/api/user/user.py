@@ -61,7 +61,7 @@ class UserRegistration(Resource):
         existing_user = Users.get_by_email(email)
         if existing_user:
             return {"success": False,
-                    "msg": "Email already taken"}, 400
+                    "msg": "This user already exists"}, 400
 
         user = Users(username=username, email=email)
         user.set_password(password)
@@ -88,11 +88,11 @@ class UserAuthentication(Resource):
 
         if not user:
             return {"success": False,
-                    "msg": "This email does not exist."}, 400
+                    "msg": "Invalid credentials"}, 400
 
         if not user.check_password(password):
             return {"success": False,
-                    "msg": "Wrong credentials."}, 400
+                    "msg": "Invalid credentials."}, 400
 
         # Generate JWT token
         access_token = jwt.encode(

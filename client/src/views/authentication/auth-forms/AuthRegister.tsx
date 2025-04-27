@@ -1,80 +1,38 @@
-"use client"
-
-import type React from "react"
-
-import { createContext, useState } from "react"
+import { useState } from "react"
 import { Eye, EyeOff, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
-import { useForm, SubmitHandler, UseFormRegister } from "react-hook-form"
-import { Inputs } from "./AuthLogin"
-
-
-interface AuthFormContextType {
-  register: UseFormRegister<Inputs> | null
-}
-
-export const AuthFormContext = createContext<AuthFormContextType>({
-  register: null
-})
+import { SubmitHandler, useForm } from "react-hook-form"
+import { Inputs } from "@/types/auth"
+import { AuthFormContext } from "@/contexts/auth-form-context"
+import useAuth from "@/hooks/useAuth"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 
 export default function SignupForm() {
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
-  const [passwordStrength, setPasswordStrength] = useState<{
-    score: number
-    message: string
-  }>({ score: 0, message: "" })
+  const [authError, setAuthError] = useState("");
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     getValues,
-    setError,
     watch,
   } = useForm<Inputs>()
-
-  const checkPasswordStrength = (password: string) => {
-
-
-    if (password.length < 8) {"Password must be greater than 8 characters"};
-    if (!/[A-Z]/.test(password)) {"Password must contain at least one uppercase letter"};
-    if (!/[a-z]/.test(password)) {"Password must contain at least one lowercase letter"};
-    if (!/[0-9]/.test(password)) {"Password must contain at least one number"};
-    if (!/[^A-Za-z0-9]/.test(password)) {"Password must contain at least one special character"};
-
-    return true
-  }
-
-  const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    setIsSubmitting(true)
-
+  const {signup} = useAuth()
+  const onSubmit: SubmitHandler<Inputs> = async ({username, email, password}: Inputs) => {
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-      console.log("Form submitted:", data)
-
-      // Success message
-      toast({
-        title: "Account created!",
-        description: "Your account has been created successfully. Redirecting to dashboard...",
-        variant: "default",
-      })
-    } catch (error) {
-      console.error("Error submitting form:", error)
-      toast({
-        title: "Error",
-        description: "There was an error creating your account. Please try again.",
-        variant: "destructive",
-      })
-    } finally {
-      setIsSubmitting(false)
+        const response = await signup({username, email, password});
+        console.log(response)
+    } catch (error: any) {
+        setAuthError(error.response.data.msg)
     }
+    
   }
 
   const togglePasswordVisibility = () => {
@@ -92,22 +50,23 @@ export default function SignupForm() {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <AuthFormContext.Provider value={{ register }}>
+          <AuthFormContext.Provider value={{ register, errors }}>
             <form className="space-y-6" onSubmit={handleSubmit(onSubmit)} aria-label="Signup form" noValidate>
               <div>
                 <Label htmlFor="fullName" className="text-sm font-medium text-gray-700">
-                  Full Name
+                  Username
                 </Label>
                 <div className="mt-1">
                   <Input
-                    id="name"
-                    name="name"
+                    id="username"
+                    name="username"
                     type="text"
-                    label="Full Name"
-                    autoComplete="name"
-                    className={`${errors.name ? "border-red-300 focus:border-red-500 focus:ring-red-500" : ""}`}
+                    label="Username"
+                    rules={{
+                      required: "Username is required"
+                    }}
+                    onChange={() => setAuthError("")}
                   />
-                  {errors.name && <p className="mt-2 text-sm text-red-600">{errors.name.message}</p>}
                 </div>
               </div>
 
@@ -121,10 +80,15 @@ export default function SignupForm() {
                     name="email"
                     type="email"
                     label="Email"
-                    autoComplete="email"
-                    className={`${errors.email ? "border-red-300 focus:border-red-500 focus:ring-red-500" : ""}`}
+                    rules={{
+                      required: "Email is required",
+                      pattern: {
+                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                        message: "Invalid email address"
+                      }
+                    }}
+                    onChange={() => setAuthError("")}
                   />
-                  {errors.email && <p className="mt-2 text-sm text-red-600">{errors.email.message}</p>}
                 </div>
               </div>
 
@@ -138,18 +102,18 @@ export default function SignupForm() {
                     name="password"
                     type={showPassword ? "text" : "password"}
                     label="Password"
-                    autoComplete="new-password"
-                    className={`${errors.password ? "border-red-300 focus:border-red-500 focus:ring-red-500" : ""}`}
-                    validate={ () => {
-                        const password = getValues("password")
-                        if (password.length < 8) {"Password must be greater than 8 characters"};
-                        if (!/[A-Z]/.test(password)) {"Password must contain at least one uppercase letter"};
-                        if (!/[a-z]/.test(password)) {"Password must contain at least one lowercase letter"};
-                        if (!/[0-9]/.test(password)) {"Password must contain at least one number"};
-                        if (!/[^A-Za-z0-9]/.test(password)) {"Password must contain at least one special character"};
-
+                    rules={{
+                      required: "Password is required",
+                      validate: (value) => {
+                        if (value.length < 8) return "Password must be greater than 8 characters";
+                        if (!/[A-Z]/.test(value)) return "Password must contain at least one uppercase letter";
+                        if (!/[a-z]/.test(value)) return "Password must contain at least one lowercase letter";
+                        if (!/[0-9]/.test(value)) return "Password must contain at least one number";
+                        if (!/[^A-Za-z0-9]/.test(value)) return "Password must contain at least one special character";
                         return true;
+                      }
                     }}
+                    onChange={() => setAuthError("")}
                   />
                   <button
                     type="button"
@@ -163,30 +127,6 @@ export default function SignupForm() {
                       <Eye className="h-4 w-4 text-gray-400" />
                     )}
                   </button>
-                  {watch("password") && (
-                    <div className="mt-2">
-                      <div className="flex items-center gap-2">
-                        <div className="h-1.5 flex-1 bg-gray-200 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full ${
-                              passwordStrength.score <= 2
-                                ? "bg-red-500"
-                                : passwordStrength.score <= 4
-                                  ? "bg-yellow-500"
-                                  : "bg-green-500"
-                            }`}
-                            style={{ width: `${Math.min(100, passwordStrength.score * 20)}%` }}
-                          />
-                        </div>
-                        <span className="text-xs text-gray-500">{passwordStrength.message}</span>
-                      </div>
-                    </div>
-                  )}
-                  {errors.password && (
-                    <p className="mt-2 text-sm text-red-600" id="password-error">
-                      {errors.password.message}
-                    </p>
-                  )}
                 </div>
               </div>
 
@@ -200,23 +140,12 @@ export default function SignupForm() {
                     name="confirmPassword"
                     type={showPassword ? "text" : "password"}
                     label="Confirm Password"
-                    autoComplete="new-password"
-                    className={`${
-                      errors.confirmPassword ? "border-red-300 focus:border-red-500 focus:ring-red-500" : ""
-                    }`}
+                    rules={{
+                      required: "Please confirm your password",
+                      validate: (value) => value === getValues("password") || "Passwords do not match"
+                    }}
                   />
-                  {errors.confirmPassword && <p className="mt-2 text-sm text-red-600">{errors.confirmPassword.message}</p>}
                 </div>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="propertyOwner"
-                  {...register("propertyOwner")}
-                />
-                <Label htmlFor="propertyOwner" className="text-sm text-gray-900">
-                  I am a UK property owner
-                </Label>
               </div>
 
               <div className="flex items-start space-x-2">
@@ -225,7 +154,7 @@ export default function SignupForm() {
                   {...register("agreeTerms", {
                     required: "You must agree to the terms and privacy policy"
                   })}
-                  className={errors.agreeTerms ? "border-red-300" : ""}
+                  className="mt-1 h-4 w-4 rounded-sm border border-gray-300 focus:ring-2 focus:ring-blue-500"
                 />
                 <div className="grid gap-1.5 leading-none">
                   <Label htmlFor="agreeTerms" className="text-sm font-medium text-gray-700">
@@ -258,6 +187,14 @@ export default function SignupForm() {
                   )}
                 </Button>
               </div>
+              {authError && (
+              <Alert
+                variant="destructive"
+                className="mb-6 animate-in fade-in-50 slide-in-from-top-5"
+              >
+                <AlertDescription>{authError}</AlertDescription>
+              </Alert>
+            )}
             </form>
           </AuthFormContext.Provider>
 

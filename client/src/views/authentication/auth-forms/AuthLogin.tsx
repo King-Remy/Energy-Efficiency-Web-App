@@ -1,56 +1,39 @@
-"use client"
-
-import type React from "react"
-
-import { createContext, useState } from "react"
+import { useState } from "react"
 import { Link } from "react-router-dom"
 import { ArrowDown, Loader2 } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { useForm, SubmitHandler, UseFormRegister, FieldErrors } from "react-hook-form"
-
-
-export type Inputs = {
-    email: string;
-    name: string;
-    password: string;
-    confirmPassword: string
-    propertyOwner: boolean
-    agreeTerms: boolean
-}
-
-interface AuthFormContextType {
-    register: UseFormRegister<Inputs> | null
-    errors: FieldErrors<Inputs>
-}
-
-export const AuthFormContext = createContext<AuthFormContextType>({
-    register: null,
-    errors: {}
-})
+import { SubmitHandler, useForm } from "react-hook-form"
+import { Inputs } from "@/types/auth"
+import { AuthFormContext } from "@/contexts/auth-form-context"
+import useAuth from "@/hooks/useAuth"
 
 export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [authError, setAuthError] = useState("");
   const {
     register,
     handleSubmit,
     formState: { errors },
     watch,
   } = useForm<Inputs>();
-
-  const onSubmit: SubmitHandler<Inputs> = (data) => {
-    console.log(data)
+  const {login} = useAuth()
+  const onSubmit: SubmitHandler<Inputs> = async ({email, password}: Inputs) => {
+    try {
+        const response = await login({email, password})
+        console.log(response)
+    } catch (error: any) {
+        console.log(error)
+        setAuthError(error.response.data.msg)
+    }
+    
+    
   }
-
-  // Simulate API call
-
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -90,85 +73,94 @@ export default function LoginPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {error && (
+            {authError && (
               <Alert
                 variant="destructive"
                 className="mb-6 animate-in fade-in-50 slide-in-from-top-5"
               >
-                <AlertDescription>{error}</AlertDescription>
+                <AlertDescription>{authError}</AlertDescription>
               </Alert>
             )}
 
             <AuthFormContext.Provider value={{ register, errors }}>
-            <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium">
-                  Email address
-                </Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  label="Email"
-                  placeholder="you@example.com"
-                  className="h-11"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="text-sm font-medium">
-                    Password
+              <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-sm font-medium">
+                    Email address
                   </Label>
-                  <Link
-                    to="#"
-                    className="text-xs font-medium text-blue-600 hover:text-blue-500 hover:underline transition-colors"
-                  >
-                    Forgot password?
-                  </Link>
-                </div>
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  label="Password"
-                  className="h-11"
-                />
-              </div>
-
-              <div className="flex items-center">
-                <div className="flex items-center gap-2">
-                  <Checkbox
-                    id="remember-me"
-                    checked={rememberMe}
-                    onCheckedChange={(checked) =>
-                      setRememberMe(checked as boolean)
-                    }
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    label="Email"
+                    placeholder="you@example.com"
+                    className="h-11"
+                    rules={{
+                        required: "Email is required"
+                      }}
+                    onChange={() => setAuthError("")}
                   />
-                  <Label
-                    htmlFor="remember-me"
-                    className="text-sm text-gray-600 font-normal"
-                  >
-                    Remember me for 30 days
-                  </Label>
                 </div>
-              </div>
 
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className="w-full h-11 bg-blue-600 hover:bg-blue-700 transition-colors"
-              >
-                {isLoading ? (
-                  <span className="flex items-center justify-center">
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Signing in...
-                  </span>
-                ) : (
-                  "Sign in"
-                )}
-              </Button>
-            </form>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password" className="text-sm font-medium">
+                      Password
+                    </Label>
+                    <Link
+                      to="#"
+                      className="text-xs font-medium text-blue-600 hover:text-blue-500 hover:underline transition-colors"
+                    >
+                      Forgot password?
+                    </Link>
+                  </div>
+                  <Input
+                    id="password"
+                    name="password"
+                    type="password"
+                    label="Password"
+                    className="h-11"
+                    rules={{
+                        required: "Password is required"
+                      }}
+                    onChange={() => setAuthError("")}
+                  />
+                </div>
+
+                <div className="flex items-center">
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      id="remember-me"
+                      checked={rememberMe}
+                      onCheckedChange={(checked) =>
+                        setRememberMe(checked as boolean)
+                      }
+                      className="h-4 w-4 rounded-sm border border-gray-300 focus:ring-2 focus:ring-blue-500"
+                    />
+                    <Label
+                      htmlFor="remember-me"
+                      className="text-sm text-gray-600 font-normal"
+                    >
+                      Remember me for 30 days
+                    </Label>
+                  </div>
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full h-11 bg-blue-600 hover:bg-blue-700 transition-colors"
+                >
+                  {isLoading ? (
+                    <span className="flex items-center justify-center">
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Signing in...
+                    </span>
+                  ) : (
+                    "Sign in"
+                  )}
+                </Button>
+              </form>
             </AuthFormContext.Provider>
 
           </CardContent>
