@@ -10,6 +10,7 @@ import { Inputs } from "@/types/auth"
 import { AuthFormContext } from "@/contexts/auth-form-context"
 import useAuth from "@/hooks/useAuth"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { useNavigate } from "react-router-dom"
 
 export default function SignupForm() {
   const { toast } = useToast()
@@ -25,6 +26,7 @@ export default function SignupForm() {
     watch,
   } = useForm<Inputs>()
   const {signup} = useAuth()
+  const navigate = useNavigate()
   const onSubmit: SubmitHandler<Inputs> = async ({username, email, password}: Inputs) => {
     try {
         const response = await signup({username, email, password});

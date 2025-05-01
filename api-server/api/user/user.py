@@ -151,3 +151,14 @@ class UserLogout(Resource):
         self.save()
 
         return {"success": True}, 200
+    
+@user_rest_api.route('/api/users/me')
+class UserMe(Resource):
+    """
+       Provides details of currently authenticated user
+    """
+    
+    @auth_required
+    def get(self, current_user):
+        return {"success": True,
+                "user": current_user.toJSON()}, 200

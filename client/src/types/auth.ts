@@ -34,7 +34,6 @@ export type Inputs = {
     confirmPassword: string;
     agreeTerms: boolean;
 }
-
 export interface AuthFormContextType {
     register: UseFormRegister<Inputs> | null;
     errors: FieldErrors<Inputs>;

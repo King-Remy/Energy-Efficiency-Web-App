@@ -1,10 +1,10 @@
-import { configureStore } from '@reduxjs/toolkit'
-import authReducer from './slices/authSlice'
+import { configureStore } from "@reduxjs/toolkit"
+import authSlice from "./authSlice"
 
 export const store = configureStore({
   reducer: {
-    auth: authReducer
-  }
+    auth: authSlice,
+  },
 })
 
 export type RootState = ReturnType<typeof store.getState>

@@ -3,7 +3,7 @@ import type { RootState } from '@/store';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function Profile() {
-  const user = useSelector((state: RootState) => state.auth.user);
+  const { user } = useSelector((state: RootState) => state.auth.value);
 
   return (
     <div className="p-6">
