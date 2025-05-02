@@ -28,13 +28,21 @@ export default function SignupForm() {
   const {signup} = useAuth()
   const navigate = useNavigate()
   const onSubmit: SubmitHandler<Inputs> = async ({username, email, password}: Inputs) => {
+    setIsSubmitting(true)
     try {
         const response = await signup({username, email, password});
         console.log(response)
+        toast({
+          title: "Account created successfully!",
+          description: "Please login with your credentials.",
+          variant: "default",
+        })
+        navigate("/login")
     } catch (error: any) {
         setAuthError(error.response.data.msg)
+    } finally {
+        setIsSubmitting(false)
     }
-    
   }
 
   const togglePasswordVisibility = () => {
@@ -153,13 +161,25 @@ export default function SignupForm() {
               <div className="flex items-start space-x-2">
                 <Checkbox
                   id="agreeTerms"
+                  onCheckedChange={(checked) => {
+                    register("agreeTerms").onChange({
+                      target: { name: "agreeTerms", value: checked },
+                    });
+                  }}
                   {...register("agreeTerms", {
                     required: "You must agree to the terms and privacy policy"
                   })}
-                  className="mt-1 h-4 w-4 rounded-sm border border-gray-300 focus:ring-2 focus:ring-blue-500"
+                  className={`mt-1 h-4 w-4 rounded-sm border focus:ring-2 focus:ring-blue-500 ${
+                    errors.agreeTerms ? 'border-red-500' : 'border-gray-300'
+                  }`}
                 />
                 <div className="grid gap-1.5 leading-none">
-                  <Label htmlFor="agreeTerms" className="text-sm font-medium text-gray-700">
+                  <Label 
+                    htmlFor="agreeTerms" 
+                    className={`text-sm font-medium ${
+                      errors.agreeTerms ? 'text-red-500' : 'text-gray-700'
+                    }`}
+                  >
                     I agree to the{" "}
                     <a href="#" className="text-primary hover:text-primary/90">
                       Terms of Service
@@ -169,15 +189,23 @@ export default function SignupForm() {
                       Privacy Policy
                     </a>
                   </Label>
-                  {errors.agreeTerms && <p className="text-sm text-red-600">{errors.agreeTerms.message}</p>}
+                  {errors.agreeTerms && (
+                    <p className="text-sm text-red-500 mt-1">
+                      {errors.agreeTerms.message}
+                    </p>
+                  )}
                 </div>
               </div>
 
               <div>
                 <Button
                   type="submit"
-                  disabled={isSubmitting}
-                  className="w-full transition-all duration-200 hover:scale-[1.02] bg-blue-600 hover:bg-blue-700 text-white"
+                  disabled={isSubmitting || !watch("agreeTerms")}
+                  className={`w-full transition-all duration-200 hover:scale-[1.02] ${
+                    !watch("agreeTerms") 
+                      ? 'bg-gray-400 cursor-not-allowed' 
+                      : 'bg-blue-600 hover:bg-blue-700'
+                  } text-white`}
                 >
                   {isSubmitting ? (
                     <span className="flex items-center">
@@ -211,8 +239,8 @@ export default function SignupForm() {
             </div>
 
             <div className="mt-6">
-              <Button variant="outline" className="w-full" asChild>
-                <a href="#">Sign in</a>
+              <Button variant="outline" className="w-full" onClick={() => navigate("/login")}>
+                Sign in
               </Button>
             </div>
           </div>

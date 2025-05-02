@@ -18,7 +18,7 @@ import useAuth from '@/hooks/useAuth';
 const Header = ({ handleSidebarToggle }: { handleSidebarToggle: () => void }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { user } = useSelector((state: RootState) => state.auth.value);
+  const { user } = useSelector((state: RootState) => state.auth);
   const { logout } = useAuth();
 
 

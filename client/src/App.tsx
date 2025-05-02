@@ -4,16 +4,18 @@ import { store } from './store';
 import './index.css';
 import NavigationScroll from './layout/NavigationScroll';
 import Routes from './routes';
-
+import { JWTProvider } from './contexts/JWTContext';
 
 function App() {
   return (
     <Provider store={store}>
-      <BrowserRouter>
-        <NavigationScroll>
-          <Routes />
-        </NavigationScroll>
-      </BrowserRouter>
+      <JWTProvider>
+        <BrowserRouter>
+          <NavigationScroll>
+            <Routes />
+          </NavigationScroll>
+        </BrowserRouter>
+      </JWTProvider>
     </Provider>
   );
 }
