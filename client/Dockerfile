@@ -1,22 +1,19 @@
 # pull official base image
-FROM node:14-alpine
+FROM node:20.17.0-alpine AS builder
 
 # set working directory
 WORKDIR /app
 
-# add `/app/node_modules/.bin` to $PATH
-ENV PATH /app/node_modules/.bin:$PATH
-
 # install app dependencies
-COPY package.json ./
-RUN npm install --silent
-RUN npm install react-scripts@4.0.0 -g --silent
+COPY package.json .
 
+RUN npm install 
 # add app
-COPY . ./
+COPY . .
 
-# Expose port
-EXPOSE 3000
+RUN npm run build
 
-# start app
-CMD ["npm", "start"]
+FROM nginx
+
+COPY --from=builder /app/build /usr/share/nginx/html
+

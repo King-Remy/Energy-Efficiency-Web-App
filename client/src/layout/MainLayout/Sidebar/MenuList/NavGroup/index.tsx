@@ -1,5 +1,5 @@
 // src/layouts/MainLayout/Sidebar/MenuList/NavGroup/index.tsx
-import { MenuItemType, MenuChildType } from '@/menu-items/types';
+import { MenuItemType } from '@/menu-items/types';
 import NavItem from '../NavItem';
 
 // ==============================|| SIDEBAR MENU GROUP ||============================== //

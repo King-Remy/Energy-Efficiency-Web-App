@@ -16,7 +16,7 @@ const MainLayout = () => {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <Sidebar drawerOpen={sidebarOpen} drawerToggle={handleSidebarToggle} />
+      <Sidebar drawerOpen={sidebarOpen} />
       
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header handleSidebarToggle={handleSidebarToggle} />

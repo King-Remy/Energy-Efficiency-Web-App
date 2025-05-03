@@ -20,19 +20,19 @@ export default function LoginPage() {
     register,
     handleSubmit,
     formState: { errors },
-    watch,
   } = useForm<Inputs>();
   const {login} = useAuth()
   const onSubmit: SubmitHandler<Inputs> = async ({email, password}: Inputs) => {
+    setIsLoading(true);
     try {
         const response = await login({email, password})
         console.log(response)
     } catch (error: any) {
         console.log(error)
         setAuthError(error.response.data.msg)
+    } finally {
+        setIsLoading(false);
     }
-    
-    
   }
 
   return (

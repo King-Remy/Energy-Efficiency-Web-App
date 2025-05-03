@@ -1,5 +1,5 @@
 
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -16,9 +16,8 @@ import useAuth from '@/hooks/useAuth';
 // ==============================|| HEADER ||============================== //
 
 const Header = ({ handleSidebarToggle }: { handleSidebarToggle: () => void }) => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { user } = useSelector((state: RootState) => state.auth);
+  const { user } = useSelector((state: RootState) => state.auth.value);
   const { logout } = useAuth();
 
 

@@ -5,7 +5,7 @@ import MenuList from './MenuList';
 
 // ==============================|| SIDEBAR ||============================== //
 
-const Sidebar = ({ drawerOpen, drawerToggle }: { drawerOpen: boolean; drawerToggle: () => void }) => {
+const Sidebar = ({ drawerOpen }: { drawerOpen: boolean }) => {
   return (
     <div 
       className={`bg-white h-full shadow-lg transition-all duration-300 fixed md:relative z-50 
