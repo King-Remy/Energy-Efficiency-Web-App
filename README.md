@@ -201,8 +201,9 @@ typescript-flask-auth/
 The TypeScript-Flask Authentication Dashboard roadmap includes these planned enhancements:
 
 ### Security Enhancements - Backend
-- **🛡️ Security Headers**: Implement robust HTTP security headers (Content Security Policy, X-Content-Type-Options, X-Frame-Options, etc.)
-- **🧹 Input Sanitization**: Add comprehensive server-side input sanitization and validation
+- **🛡️ Security Headers**: Implement robust HTTP security headers (Content Security Policy, X-Content-Type-Options, X-Frame-Options and HSTS.)
+- **🧹 Input Validation**: Add comprehensive server-side input validation
+- **🧹 Input Sanitization**: Add comprehensive server-side input sanitization
 - **📊 Failed Login Tracking**: Implement rate limiting and temporary account lockouts
 
 ### Security Enhancements - Frontend
@@ -227,4 +228,5 @@ The TypeScript-Flask Authentication Dashboard roadmap includes these planned enh
 
 ### Developer Experience
 - **📚 API Documentation**: Interactive Swagger/OpenAPI documentation
+- **🧪 User Test Coverage**: User testing for front end
 - **🧪 Expanded Test Coverage**: E2E testing
