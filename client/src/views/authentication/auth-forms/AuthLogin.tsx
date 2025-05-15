@@ -11,6 +11,8 @@ import { SubmitHandler, useForm } from "react-hook-form"
 import { Inputs } from "@/types/auth"
 import { AuthFormContext } from "@/contexts/auth-form-context"
 import useAuth from "@/hooks/useAuth"
+import { useContext } from "react"
+import JWTContext from "@/contexts/JWTContext"
 
 export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
@@ -21,11 +23,11 @@ export default function LoginPage() {
     handleSubmit,
     formState: { errors },
   } = useForm<Inputs>();
-  const {login} = useAuth()
-  const onSubmit: SubmitHandler<Inputs> = async ({email, password}: Inputs) => {
+  const {login} = useContext(JWTContext)
+  const onSubmit: SubmitHandler<Inputs> = async (data: Inputs) => {
     setIsLoading(true);
     try {
-        const response = await login({email, password})
+        const response = await login(data.email, data.password)
         console.log(response)
     } catch (error: any) {
         console.log(error)

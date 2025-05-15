@@ -73,9 +73,9 @@ export const JWTProvider: React.FC<JWTProviderProps> = ({ children }) => {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await axiosInstance.post('/auth/login', { email, password });
-      const { access_token: serviceToken, user } = response.data;
-      setSession(serviceToken);
+      const response = await axiosInstance.post("/api/users/login", { email, password });
+      const { token, user } = response.data;
+      setSession(token);
       dispatch(setUser(user));
       return response.data;
     } catch (error) {
@@ -84,19 +84,15 @@ export const JWTProvider: React.FC<JWTProviderProps> = ({ children }) => {
     }
   };
 
-  const register = async (username: string, email: string, password: string): Promise<void> => {
+  const register = async (username: string, email: string, password: string) => {
     try {
-      const response = await axiosInstance.post('/auth/register', {
+      const response = await axiosInstance.post("/api/users/register", {
         username,
         email,
         password
       });
       
-      if (response.data.user && response.data.access_token) {
-        const { access_token: serviceToken, user } = response.data;
-        setSession(serviceToken);
-        dispatch(setUser(user));
-      }
+      return response.data;
     } catch (error) {
       console.error('Registration error:', error);
       throw error;
@@ -115,7 +111,7 @@ export const JWTProvider: React.FC<JWTProviderProps> = ({ children }) => {
         
         if (serviceToken && verifyToken(serviceToken)) {
           setSession(serviceToken);
-          const response = await axiosInstance.get('/auth/me');
+          const response = await axiosInstance.get("/api/users/me");
           const { user } = response.data;
           dispatch(setUser(user));
         } else {

@@ -8,9 +8,10 @@ import { useToast } from "@/hooks/use-toast"
 import { SubmitHandler, useForm } from "react-hook-form"
 import { Inputs } from "@/types/auth"
 import { AuthFormContext } from "@/contexts/auth-form-context"
-import useAuth from "@/hooks/useAuth"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useNavigate } from "react-router-dom"
+import { useContext } from "react"
+import JWTContext from "@/contexts/JWTContext"
 
 export default function SignupForm() {
   const { toast } = useToast()
@@ -25,12 +26,12 @@ export default function SignupForm() {
     getValues,
     watch,
   } = useForm<Inputs>()
-  const {signup} = useAuth()
+  const {register: registerUser} = useContext(JWTContext)
   const navigate = useNavigate()
-  const onSubmit: SubmitHandler<Inputs> = async ({username, email, password}: Inputs) => {
+  const onSubmit: SubmitHandler<Inputs> = async (data: Inputs) => {
     setIsSubmitting(true)
     try {
-        const response = await signup({username, email, password});
+        const response = await registerUser(data.username, data.email, data.password);
         console.log(response)
         toast({
           title: "Account created successfully!",

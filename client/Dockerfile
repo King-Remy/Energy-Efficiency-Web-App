@@ -1,5 +1,5 @@
 # pull official base image
-FROM node:20.17.0-alpine AS builder
+FROM node:20-alpine AS builder
 
 # set working directory
 WORKDIR /app
@@ -8,6 +8,7 @@ WORKDIR /app
 COPY package.json .
 
 RUN npm install 
+
 # add app
 COPY . .
 

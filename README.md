@@ -195,3 +195,36 @@ typescript-flask-auth/
 - **🚫 Protected Routes**: Secure routing with authentication guards
 - **✅ Form Validation**: Client and server-side validation for data integrity
 - **⚠️ Error Handling**: Proper error handling and user feedback
+
+## 🚀 Upcoming Features
+
+The TypeScript-Flask Authentication Dashboard roadmap includes these planned enhancements:
+
+### Security Enhancements - Backend
+- **🛡️ Security Headers**: Implement robust HTTP security headers (Content Security Policy, X-Content-Type-Options, X-Frame-Options, etc.)
+- **🧹 Input Sanitization**: Add comprehensive server-side input sanitization and validation
+- **📊 Failed Login Tracking**: Implement rate limiting and temporary account lockouts
+
+### Security Enhancements - Frontend
+- **🔒 Content Security Policy (CSP)**: Implement CSP to prevent XSS attacks
+- **🔄 Token Refresh**: Add automatic JWT token refresh mechanism
+- **🧹 Input Sanitization**: Implement client-side input sanitization before API calls
+- **🔍 Security Headers Verification**: Client-side verification of security headers
+
+### Authentication Enhancements
+- **🔐 OAuth 2.0 Integration**: Social login with Google, GitHub, and Microsoft
+
+### User Management
+- **👥 User Profile Management**: Self-service profile updates and avatar uploads
+- **🔄 Password Reset Flow**: Complete self-service password recovery
+- **👮 Admin Dashboard**: User management interface for administrators
+
+### Infrastructure
+- **🚀 Production Readiness**: Optimize configuration for production deployment
+- **🐳 Docker Containerization**: Simplified deployment with Docker Compose
+- **☁️ CI/CD Pipeline**: Automated testing and deployment workflows
+- **📈 Performance Monitoring**: Integration with monitoring tools
+
+### Developer Experience
+- **📚 API Documentation**: Interactive Swagger/OpenAPI documentation
+- **🧪 Expanded Test Coverage**: E2E testing
