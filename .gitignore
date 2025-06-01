@@ -1,24 +1,45 @@
-node_modules
-dist
-dist-ssr
-*.local
-__pycache__
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-# Cursor rules directory
-.cursor/rules
-
+# Python / Flask (backend)
+venv/
 .env
-
+.env.*
+__pycache__/
+instance/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.coverage
+coverage.*
+.pylint.d/
+.python-version
+.envrc
+.secret
+.token
+.db.sqlite3
 *.sqlite3
 *.db
+.cache/
+.ipynb_checkpoints/
+migrations/versions/
+
+# Node/Vite/TypeScript (frontend)
+node_modules/
+.env
+.env.*
+dist/
+.DS_Store
+.vscode/
+.idea/
+.cache/
+yarn-error.log
+npm-debug.log
+.eslintcache
+coverage/
+
+# General
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+*.bak
+*.tmp
