@@ -12,6 +12,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useNavigate } from "react-router-dom"
 import { useContext } from "react"
 import JWTContext from "@/contexts/JWTContext"
+import { sanitizeUsername, sanitizeEmail } from "@/utils/sanitization"
 
 export default function SignupForm() {
   const { toast } = useToast()
@@ -31,7 +32,14 @@ export default function SignupForm() {
   const onSubmit: SubmitHandler<Inputs> = async (data: Inputs) => {
     setIsSubmitting(true)
     try {
-        const response = await registerUser(data.username, data.email, data.password);
+        // Sanitize inputs before sending to backend
+        const sanitizedData = {
+          username: sanitizeUsername(data.username),
+          email: sanitizeEmail(data.email),
+          password: data.password // Don't sanitize passwords - they need to remain as-is
+        };
+
+        const response = await registerUser(sanitizedData.username, sanitizedData.email, sanitizedData.password);
         console.log(response)
         toast({
           title: "Account created successfully!",

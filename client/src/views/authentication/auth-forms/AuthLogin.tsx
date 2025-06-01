@@ -10,9 +10,9 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { SubmitHandler, useForm } from "react-hook-form"
 import { Inputs } from "@/types/auth"
 import { AuthFormContext } from "@/contexts/auth-form-context"
-import useAuth from "@/hooks/useAuth"
 import { useContext } from "react"
 import JWTContext from "@/contexts/JWTContext"
+import { sanitizeEmail } from "@/utils/sanitization"
 
 export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
@@ -27,7 +27,13 @@ export default function LoginPage() {
   const onSubmit: SubmitHandler<Inputs> = async (data: Inputs) => {
     setIsLoading(true);
     try {
-        const response = await login(data.email, data.password)
+        // Sanitize inputs before sending to backend
+        const sanitizedData = {
+          email: sanitizeEmail(data.email),
+          password: data.password // Don't sanitize passwords - they need to remain as-is
+        };
+
+        const response = await login(sanitizedData.email, sanitizedData.password)
         console.log(response)
     } catch (error: any) {
         console.log(error)

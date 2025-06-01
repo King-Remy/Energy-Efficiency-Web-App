@@ -5,11 +5,13 @@ from functools import wraps
 from flask import request
 from flask_restx import Api, Resource, fields
 
+import re
 import jwt
 
 from api.user.models import db, Users, JWTTokenBlocklist
 from api.config import Config
 from api.auth.auth import auth_required
+from api.validator import validate_and_sanitize_input
 
 user_rest_api = Api(title="Users API", version="1.0")
 
@@ -54,10 +56,20 @@ class UserRegistration(Resource):
     def post(self):
         data = request.get_json()
 
-        username = data.get("username")
-        email = data.get("email")
-        password = data.get("password")
+        # Sanitize and validate inputs
+        username, error = validate_and_sanitize_input(data.get("username"), "username")
+        if error:
+            return {"message": error}, 400
+            
+        email, error = validate_and_sanitize_input(data.get("email"), "email")
+        if error:
+            return {"message": error}, 400
+            
+        password, error = validate_and_sanitize_input(data.get("password"), "password")
+        if error:
+            return {"message": error}, 400
 
+        # Check if user already exists
         existing_user = Users.get_by_email(email)
         if existing_user:
             return {"success": False,
@@ -84,6 +96,17 @@ class UserAuthentication(Resource):
         email = data.get("email")
         password = data.get("password")
 
+        # Sanitize and validate inputs
+        email, error = validate_and_sanitize_input(data.get("email"), "email")
+        if error:
+            return {"success": False,
+                    "msg": error}, 400
+
+        password, error = validate_and_sanitize_input(data.get("password"), "password")
+        if error:
+            return {"success": False,
+                    "msg": error}, 400
+
         user = Users.get_by_email(email)
 
         if not user:
@@ -96,8 +119,8 @@ class UserAuthentication(Resource):
 
         # Generate JWT token
         access_token = jwt.encode(
-            {'email': email, 'exp': datetime.utcnow() + timedelta(minutes=30)},
-            Config.SECRET_KEY
+            {'email': email, 'exp': datetime.utcnow() + Config.JWT_ACCESS_TOKEN_EXPIRES},
+            Config.JWT_SECRET_KEY
         )
 
         user.set_jwt_auth_active(True)
@@ -118,9 +141,30 @@ class UserProfileUpdate(Resource):
     def post(self, current_user):
         data = request.get_json()
 
-        new_username = data.get("username")
-        new_email = data.get("email")
+        # Sanitize and validate new username if provided
+        new_username = None
+        if data.get("username"):
+            new_username, error = validate_and_sanitize_input(data.get("username"), "username")
+            if error:
+                return {"success": False,
+                        "msg": error}, 400
 
+        # Sanitize and validate new email if provided
+        new_email = None
+        if data.get("email"):
+            new_email, error = validate_and_sanitize_input(data.get("email"), "email")
+            if error:
+                return {"success": False,
+                        "msg": error}, 400
+
+        # Check if email already exists (if changing email)
+        if new_email and new_email != current_user.email:
+            existing_user = Users.get_by_email(new_email)
+            if existing_user:
+                return {"success": False,
+                        "msg": "Email already exists"}, 400
+        
+        # Update user fields
         if new_username:
             self.update_username(new_username)
 
